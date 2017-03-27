@@ -23,7 +23,6 @@ class LoginViewController: UIViewController, DataBaseDelegateAPI {
         let dataBase = DataBaseAPI.shared
         dataBase.delegate = self
         
-        
         dataBase.loadData()
         
         
