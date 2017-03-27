@@ -43,6 +43,10 @@ class MapController: UIViewController, MKMapViewDelegate {
                 print("Error")
             }
             if let placemark = placemarks?.first {
+                self.mapView?.showsUserLocation = true
+                self.mapView?.showsCompass = true
+                self.mapView?.showsScale = true
+                self.mapView?.mapType = .standard
                 // Coordonnées de départ
                 let coordonneesDepart = CLLocationCoordinate2D(latitude: 48.851630, longitude: 2.286597)
                 let pointDepart = MKPointAnnotation()
@@ -97,11 +101,6 @@ class MapController: UIViewController, MKMapViewDelegate {
         
         let locationManager = CLLocationManager()
         locationManager.requestWhenInUseAuthorization()
-        
-        mapView?.showsUserLocation = true
-        mapView?.showsCompass = true
-        mapView?.showsScale = true
-        mapView?.mapType = .standard
         
 
         

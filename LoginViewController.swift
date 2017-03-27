@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import SystemConfiguration
 
 class LoginViewController: UIViewController, DataBaseDelegateAPI {
     
@@ -16,14 +17,50 @@ class LoginViewController: UIViewController, DataBaseDelegateAPI {
     @IBOutlet var user_password : UITextField?
     @IBOutlet var login_button : UIButton?
     
+    func isInternetAvailable() -> Bool {
+        
+        var zeroAddress = sockaddr_in()
+        zeroAddress.sin_len = UInt8(MemoryLayout<sockaddr_in>.size)
+        zeroAddress.sin_family = sa_family_t(AF_INET)
+        
+        guard let defaultRouteReachability = withUnsafePointer(to: &zeroAddress, {
+            $0.withMemoryRebound(to: sockaddr.self, capacity: 1) {
+                SCNetworkReachabilityCreateWithAddress(nil, $0)
+            }
+        }) else {
+            return false
+        }
+        
+        var flags: SCNetworkReachabilityFlags = []
+        if !SCNetworkReachabilityGetFlags(defaultRouteReachability, &flags) {
+            return false
+        }
+        
+        let isReachable = flags.contains(.reachable)
+        let needsConnection = flags.contains(.connectionRequired)
+        
+        return (isReachable && !needsConnection)
+    }
+    
+    
     override func viewDidLoad()
     {
-        super.viewDidLoad()
         
-        let dataBase = DataBaseAPI.shared
-        dataBase.delegate = self
-        
-        dataBase.loadData()
+        if(isInternetAvailable())
+        {
+            print("internet ok")
+            super.viewDidLoad()
+            let dataBase = DataBaseAPI.shared
+            dataBase.delegate = self
+            
+            dataBase.loadData()
+        }else
+        {
+            while isInternetAvailable() == false {
+                isInternetAvailable()
+                print("internet pas ok")
+            }
+        }
         
         
         // Uncomment the following line to preserve selection between presentations
